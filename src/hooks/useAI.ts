@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 type AIFeature = "generate" | "hashtags" | "sentiment" | "calendar" | "competitors" | "image";
@@ -27,13 +28,63 @@ export function useAI() {
     setImageResult(null);
 
     try {
+      // For image generation, use invoke (non-streaming)
+      if (options.feature === "image") {
+        const { data, error } = await supabase.functions.invoke("ai-marketing", {
+          body: {
+            feature: options.feature,
+            prompt,
+            platform: options.platform,
+            tone: options.tone,
+            context: options.context,
+          },
+        });
+
+        if (error) {
+          throw new Error(error.message || "AI request failed");
+        }
+
+        if (data?.error) {
+          if (data.error.includes("Rate limit")) {
+            toast({
+              title: "Rate Limited",
+              description: "Too many requests. Please wait a moment and try again.",
+              variant: "destructive",
+            });
+            throw new Error("Rate limited");
+          }
+          if (data.error.includes("Usage limit") || data.error.includes("Payment")) {
+            toast({
+              title: "Usage Limit",
+              description: "AI usage limit reached. Please add credits to continue.",
+              variant: "destructive",
+            });
+            throw new Error("Usage limit");
+          }
+          throw new Error(data.error);
+        }
+
+        setImageResult(data as ImageResult);
+        setIsLoading(false);
+        return data;
+      }
+
+      // For text features, use fetch for streaming
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      // Get the Supabase URL from the client
+      const supabaseUrl = (supabase as any).supabaseUrl || import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-marketing`,
+        `${supabaseUrl}/functions/v1/ai-marketing`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            "Authorization": `Bearer ${accessToken || anonKey}`,
+            "apikey": anonKey,
           },
           body: JSON.stringify({
             feature: options.feature,
@@ -46,7 +97,14 @@ export function useAI() {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorMessage = "AI request failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Response might not be JSON
+        }
+        
         if (response.status === 429) {
           toast({
             title: "Rate Limited",
@@ -63,18 +121,10 @@ export function useAI() {
           });
           throw new Error("Usage limit");
         }
-        throw new Error(errorData.error || "AI request failed");
+        throw new Error(errorMessage);
       }
 
-      // For image generation, handle JSON response
-      if (options.feature === "image") {
-        const data = await response.json() as ImageResult;
-        setImageResult(data);
-        setIsLoading(false);
-        return data;
-      }
-
-      // For text features, handle streaming
+      // Handle streaming
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No response body");
 
@@ -108,6 +158,7 @@ export function useAI() {
               setResult(fullContent);
             }
           } catch {
+            // Partial JSON, put it back
             textBuffer = line + "\n" + textBuffer;
             break;
           }
