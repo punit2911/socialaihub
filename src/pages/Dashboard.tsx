@@ -10,6 +10,7 @@ import {
   Users,
   MessageSquare,
   Zap,
+  Heart,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { FeatureCard } from "@/components/dashboard/FeatureCard";
@@ -68,43 +69,102 @@ const stats = [
   { icon: Zap, label: "Time Saved", value: "48h", change: "this month", trend: "neutral" as const },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.5 }
+  },
+};
+
 export default function Dashboard() {
   return (
     <DashboardLayout>
-      {/* Hero section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h1 className="font-display text-4xl lg:text-5xl font-bold mb-3">
-          Welcome to{" "}
-          <span className="text-primary text-glow">SocialAI Hub</span>
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl">
-          Your AI-powered command center for social media marketing. Create, analyze, and optimize your content with cutting-edge AI.
-        </p>
-      </motion.div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat, index) => (
-          <StatCard key={stat.label} {...stat} delay={index * 0.1} />
-        ))}
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-success/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "4s" }} />
       </div>
 
-      {/* Quick tip */}
+      {/* Hero section */}
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="mb-8 relative"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+          className="absolute -top-4 -left-4 w-20 h-20 bg-primary/10 rounded-full blur-xl"
+        />
+        <h1 className="font-display text-4xl lg:text-5xl font-bold mb-3">
+          Welcome to{" "}
+          <motion.span 
+            className="text-primary text-glow inline-block"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, type: "spring", stiffness: 150 }}
+          >
+            SocialAI Hub
+          </motion.span>
+        </h1>
+        <motion.p 
+          className="text-lg text-muted-foreground max-w-2xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          Your AI-powered command center for social media marketing. Create, analyze, and optimize your content with cutting-edge AI.
+        </motion.p>
+      </motion.div>
+
+      {/* Stats with stagger animation */}
+      <motion.div 
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {stats.map((stat, index) => (
+          <motion.div key={stat.label} variants={itemVariants}>
+            <StatCard {...stat} delay={0} />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Quick tip with slide animation */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
         className="mb-8"
       >
-        <GlassCard className="p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+        <GlassCard className="p-4 flex items-center gap-4 overflow-hidden relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <motion.div 
+            className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 relative"
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          >
             <Zap className="w-5 h-5 text-accent" />
-          </div>
-          <div className="flex-1">
+            <div className="absolute inset-0 rounded-full bg-accent/30 animate-pulse-ring" />
+          </motion.div>
+          <div className="flex-1 relative">
             <p className="text-sm font-medium">Pro Tip</p>
             <p className="text-sm text-muted-foreground">
               Start with the Content Generator to create your base posts, then optimize with Hashtag suggestions for maximum reach!
@@ -113,19 +173,63 @@ export default function Dashboard() {
         </GlassCard>
       </motion.div>
 
-      {/* Features grid */}
-      <div>
-        <h2 className="font-display text-xl font-semibold mb-4">AI Features</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Features grid with stagger */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9 }}
+      >
+        <motion.h2 
+          className="font-display text-xl font-semibold mb-4"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1 }}
+        >
+          AI Features
+        </motion.h2>
+        <motion.div 
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {features.map((feature, index) => (
-            <FeatureCard
+            <motion.div
               key={feature.path}
-              {...feature}
-              delay={0.5 + index * 0.1}
-            />
+              variants={itemVariants}
+              whileHover={{ scale: 1.02, y: -5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <FeatureCard {...feature} delay={0} />
+            </motion.div>
           ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Footer credit */}
+      <motion.footer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="mt-16 pt-8 border-t border-border/50"
+      >
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <span>Created with</span>
+          <motion.span
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          >
+            <Heart className="w-4 h-4 text-accent fill-accent" />
+          </motion.span>
+          <span>by</span>
+          <motion.span 
+            className="font-display font-semibold text-primary text-glow"
+            whileHover={{ scale: 1.05 }}
+          >
+            Punit Gavali
+          </motion.span>
         </div>
-      </div>
+      </motion.footer>
     </DashboardLayout>
   );
 }
