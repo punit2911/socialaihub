@@ -12,6 +12,7 @@ import ImageCreator from "./pages/ImageCreator";
 import SentimentAnalysis from "./pages/SentimentAnalysis";
 import ContentCalendar from "./pages/ContentCalendar";
 import CompetitorAnalysis from "./pages/CompetitorAnalysis";
+import ProfileSettings from "./pages/ProfileSettings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/sentiment" element={<ProtectedRoute><SentimentAnalysis /></ProtectedRoute>} />
             <Route path="/calendar" element={<ProtectedRoute><ContentCalendar /></ProtectedRoute>} />
             <Route path="/competitors" element={<ProtectedRoute><CompetitorAnalysis /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
