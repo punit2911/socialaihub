@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +12,68 @@ export interface StatCardProps {
   trend?: "up" | "down" | "neutral";
   delay?: number;
   isLoading?: boolean;
+}
+
+// Parse numeric value from string (handles "1,247", "34%", "48h", "5.2%")
+function parseNumericValue(value: string | number): { num: number; prefix: string; suffix: string } {
+  if (typeof value === "number") {
+    return { num: value, prefix: "", suffix: "" };
+  }
+  
+  const match = value.match(/^([^\d]*)([\d,.]+)(.*)$/);
+  if (match) {
+    const num = parseFloat(match[2].replace(/,/g, ""));
+    return { num, prefix: match[1], suffix: match[3] };
+  }
+  
+  return { num: 0, prefix: "", suffix: value };
+}
+
+// Format number with commas
+function formatNumber(num: number, hasDecimals: boolean): string {
+  if (hasDecimals) {
+    return num.toFixed(1);
+  }
+  return Math.round(num).toLocaleString();
+}
+
+// Animated counter component
+function AnimatedCounter({ value, duration = 1.5 }: { value: string | number; duration?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const [displayValue, setDisplayValue] = useState("0");
+  
+  const { num, prefix, suffix } = parseNumericValue(value);
+  const hasDecimals = typeof value === "string" && value.includes(".");
+  
+  useEffect(() => {
+    if (!isInView) return;
+    
+    const startTime = Date.now();
+    const endTime = startTime + duration * 1000;
+    
+    const animate = () => {
+      const now = Date.now();
+      const progress = Math.min((now - startTime) / (duration * 1000), 1);
+      
+      // Easing function (ease-out cubic)
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      
+      const currentValue = num * easedProgress;
+      setDisplayValue(prefix + formatNumber(currentValue, hasDecimals) + suffix);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Ensure final value is exact
+        setDisplayValue(typeof value === "number" ? value.toLocaleString() : value);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [isInView, num, prefix, suffix, duration, value, hasDecimals]);
+  
+  return <span ref={ref}>{displayValue}</span>;
 }
 
 export function StatCard({
@@ -77,7 +140,7 @@ export function StatCard({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {value}
+            <AnimatedCounter value={value} duration={1.5} />
           </motion.p>
         )}
         <p className="text-xs text-muted-foreground">{label}</p>
