@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          created_at: string
+          engagement_rate: number
+          id: string
+          posts_generated: number
+          reach_increase: number
+          time_saved_hours: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          engagement_rate?: number
+          id?: string
+          posts_generated?: number
+          reach_increase?: number
+          time_saved_hours?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          engagement_rate?: number
+          id?: string
+          posts_generated?: number
+          reach_increase?: number
+          time_saved_hours?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
