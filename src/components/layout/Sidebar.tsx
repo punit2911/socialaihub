@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavItem {
   icon: React.ElementType;
@@ -34,15 +35,19 @@ const navItems: NavItem[] = [
   { icon: Target, label: "Competitor Analysis", path: "/competitors", badge: "AI" },
 ];
 
-interface SidebarProps {
-  onLogout?: () => void;
-  userName?: string;
-}
-
-export function Sidebar({ onLogout, userName }: SidebarProps) {
+export function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
+
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email;
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -156,7 +161,7 @@ export function Sidebar({ onLogout, userName }: SidebarProps) {
             "w-full justify-start text-muted-foreground hover:text-destructive group",
             isCollapsed && "justify-center"
           )}
-          onClick={onLogout}
+          onClick={handleLogout}
         >
           <motion.div
             whileHover={{ x: -3 }}
