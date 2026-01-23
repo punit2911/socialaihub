@@ -51,6 +51,7 @@ function AnimatedCounter({
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const [displayValue, setDisplayValue] = useState("0");
   const [hasStarted, setHasStarted] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   
   const { num, prefix, suffix } = parseNumericValue(value);
   const hasDecimals = typeof value === "string" && value.includes(".");
@@ -86,13 +87,27 @@ function AnimatedCounter({
       } else {
         // Ensure final value is exact
         setDisplayValue(typeof value === "number" ? value.toLocaleString() : value);
+        setIsComplete(true);
       }
     };
     
     requestAnimationFrame(animate);
   }, [hasStarted, num, prefix, suffix, duration, value, hasDecimals]);
   
-  return <span ref={ref}>{displayValue}</span>;
+  return (
+    <motion.span 
+      ref={ref}
+      animate={isComplete ? { 
+        scale: [1, 1.08, 0.95, 1.02, 1],
+      } : {}}
+      transition={{ 
+        duration: 0.4, 
+        ease: "easeOut",
+      }}
+    >
+      {displayValue}
+    </motion.span>
+  );
 }
 
 export function StatCard({
