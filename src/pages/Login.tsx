@@ -154,15 +154,7 @@ export default function Login() {
           transition={{ delay: 1, duration: 0.4 }}
           className="text-center text-sm text-muted-foreground mt-6"
         >
-          Created with{" "}
-          <motion.span
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="inline-block text-red-500"
-          >
-            ❤️
-          </motion.span>{" "}
-          by <span className="text-primary font-medium">Punit Gavali</span>
+          Created by <span className="text-primary font-medium">Punit Gavali</span>
         </motion.p>
       </motion.div>
     </div>

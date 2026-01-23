@@ -214,14 +214,7 @@ export default function Dashboard() {
         className="mt-16 pt-8 border-t border-border/50"
       >
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <span>Created with</span>
-          <motion.span
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-          >
-            <Heart className="w-4 h-4 text-accent fill-accent" />
-          </motion.span>
-          <span>by</span>
+          <span>Created by</span>
           <motion.span 
             className="font-display font-semibold text-primary text-glow"
             whileHover={{ scale: 1.05 }}
