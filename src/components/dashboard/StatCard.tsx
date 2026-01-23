@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,8 +37,69 @@ function formatNumber(num: number, hasDecimals: boolean): string {
   return Math.round(num).toLocaleString();
 }
 
+// Sparkle component
+function Sparkle({ delay, x, y }: { delay: number; x: number; y: number }) {
+  return (
+    <motion.div
+      className="absolute pointer-events-none"
+      style={{ left: `${x}%`, top: `${y}%` }}
+      initial={{ scale: 0, opacity: 1 }}
+      animate={{ 
+        scale: [0, 1.5, 0],
+        opacity: [1, 1, 0],
+        rotate: [0, 180],
+      }}
+      transition={{ 
+        duration: 0.6, 
+        delay,
+        ease: "easeOut"
+      }}
+    >
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path
+          d="M6 0L7.5 4.5L12 6L7.5 7.5L6 12L4.5 7.5L0 6L4.5 4.5L6 0Z"
+          fill="currentColor"
+          className="text-primary"
+        />
+      </svg>
+    </motion.div>
+  );
+}
+
+// Sparkles container
+function SparklesEffect({ show }: { show: boolean }) {
+  const sparkles = [
+    { x: 10, y: 20, delay: 0 },
+    { x: 80, y: 10, delay: 0.1 },
+    { x: 50, y: 5, delay: 0.05 },
+    { x: 90, y: 40, delay: 0.15 },
+    { x: 20, y: 50, delay: 0.08 },
+    { x: 70, y: 60, delay: 0.12 },
+  ];
+
+  return (
+    <AnimatePresence>
+      {show && (
+        <div className="absolute inset-0 overflow-visible">
+          {sparkles.map((sparkle, i) => (
+            <Sparkle key={i} {...sparkle} />
+          ))}
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // Animated counter component
-function AnimatedCounter({ value, duration = 1.5 }: { value: string | number; duration?: number }) {
+function AnimatedCounter({ 
+  value, 
+  duration = 1.5,
+  onComplete 
+}: { 
+  value: string | number; 
+  duration?: number;
+  onComplete?: () => void;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const [displayValue, setDisplayValue] = useState("0");
@@ -67,11 +128,12 @@ function AnimatedCounter({ value, duration = 1.5 }: { value: string | number; du
       } else {
         // Ensure final value is exact
         setDisplayValue(typeof value === "number" ? value.toLocaleString() : value);
+        onComplete?.();
       }
     };
     
     requestAnimationFrame(animate);
-  }, [isInView, num, prefix, suffix, duration, value, hasDecimals]);
+  }, [isInView, num, prefix, suffix, duration, value, hasDecimals, onComplete]);
   
   return <span ref={ref}>{displayValue}</span>;
 }
@@ -85,6 +147,8 @@ export function StatCard({
   delay = 0,
   isLoading = false,
 }: StatCardProps) {
+  const [showSparkles, setShowSparkles] = useState(false);
+
   const trendColors = {
     up: "text-success",
     down: "text-destructive",
@@ -97,12 +161,21 @@ export function StatCard({
     neutral: "→",
   };
 
+  const handleCountComplete = () => {
+    setShowSparkles(true);
+    // Hide sparkles after animation
+    setTimeout(() => setShowSparkles(false), 800);
+  };
+
   return (
     <motion.div
       className="stat-card group cursor-pointer relative overflow-hidden"
       whileHover={{ scale: 1.02, y: -2 }}
       transition={{ type: "spring", stiffness: 300 }}
     >
+      {/* Sparkles effect */}
+      <SparklesEffect show={showSparkles} />
+
       {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
@@ -110,6 +183,18 @@ export function StatCard({
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
       </div>
+
+      {/* Glow pulse on complete */}
+      <AnimatePresence>
+        {showSparkles && (
+          <motion.div
+            className="absolute inset-0 rounded-xl bg-primary/20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.5, 0] }}
+            transition={{ duration: 0.5 }}
+          />
+        )}
+      </AnimatePresence>
 
       <div className="flex items-center justify-between relative">
         <motion.div 
@@ -140,7 +225,7 @@ export function StatCard({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <AnimatedCounter value={value} duration={1.5} />
+            <AnimatedCounter value={value} duration={1.5} onComplete={handleCountComplete} />
           </motion.p>
         )}
         <p className="text-xs text-muted-foreground">{label}</p>
