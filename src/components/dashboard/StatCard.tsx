@@ -94,21 +94,35 @@ function SparklesEffect({ show }: { show: boolean }) {
 function AnimatedCounter({ 
   value, 
   duration = 1.5,
+  startDelay = 0.8,
   onComplete 
 }: { 
   value: string | number; 
   duration?: number;
+  startDelay?: number;
   onComplete?: () => void;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const [displayValue, setDisplayValue] = useState("0");
+  const [hasStarted, setHasStarted] = useState(false);
   
   const { num, prefix, suffix } = parseNumericValue(value);
   const hasDecimals = typeof value === "string" && value.includes(".");
   
+  // Handle start delay
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || hasStarted) return;
+    
+    const delayTimer = setTimeout(() => {
+      setHasStarted(true);
+    }, startDelay * 1000);
+    
+    return () => clearTimeout(delayTimer);
+  }, [isInView, startDelay, hasStarted]);
+  
+  useEffect(() => {
+    if (!hasStarted) return;
     
     const startTime = Date.now();
     const endTime = startTime + duration * 1000;
@@ -133,7 +147,7 @@ function AnimatedCounter({
     };
     
     requestAnimationFrame(animate);
-  }, [isInView, num, prefix, suffix, duration, value, hasDecimals, onComplete]);
+  }, [hasStarted, num, prefix, suffix, duration, value, hasDecimals, onComplete]);
   
   return <span ref={ref}>{displayValue}</span>;
 }
