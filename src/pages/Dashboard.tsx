@@ -213,15 +213,26 @@ export default function Dashboard() {
         transition={{ delay: 1.5 }}
         className="mt-16 pt-8 border-t border-border/50"
       >
-        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+        <motion.div 
+          className="flex items-center justify-center gap-2 text-sm text-muted-foreground cursor-default"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 400 }}
+        >
           <span>Created by</span>
           <motion.span 
-            className="font-display font-semibold text-primary text-glow"
-            whileHover={{ scale: 1.05 }}
+            className="font-display font-semibold text-primary text-glow relative"
+            whileHover={{ scale: 1.1, textShadow: "0 0 12px hsl(var(--primary))" }}
+            transition={{ type: "spring", stiffness: 300 }}
           >
             Punit Gavali
+            <motion.span
+              className="absolute -bottom-0.5 left-0 w-full h-0.5 bg-primary origin-left"
+              initial={{ scaleX: 0 }}
+              whileHover={{ scaleX: 1 }}
+              transition={{ duration: 0.3 }}
+            />
           </motion.span>
-        </div>
+        </motion.div>
       </motion.footer>
     </DashboardLayout>
   );

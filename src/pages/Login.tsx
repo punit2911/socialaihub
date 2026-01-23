@@ -154,7 +154,14 @@ export default function Login() {
           transition={{ delay: 1, duration: 0.4 }}
           className="text-center text-sm text-muted-foreground mt-6"
         >
-          Created by <span className="text-primary font-medium">Punit Gavali</span>
+          Created by{" "}
+          <motion.span 
+            className="text-primary font-medium inline-block cursor-default"
+            whileHover={{ scale: 1.1, textShadow: "0 0 12px hsl(var(--primary))" }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            Punit Gavali
+          </motion.span>
         </motion.p>
       </motion.div>
     </div>
