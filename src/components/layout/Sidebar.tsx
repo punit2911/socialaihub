@@ -187,14 +187,55 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* Animated mobile menu toggle button */}
       <motion.button
-        onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg glass-card"
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className="lg:hidden fixed top-4 left-4 z-[60] p-3 rounded-xl glass-card overflow-hidden"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        aria-label={isMobileOpen ? "Close menu" : "Open menu"}
       >
-        <Menu className="w-6 h-6" />
+        <div className="relative w-6 h-5 flex flex-col justify-between">
+          {/* Top bar */}
+          <motion.span
+            className="block h-0.5 w-full bg-primary rounded-full origin-left"
+            animate={{
+              rotate: isMobileOpen ? 45 : 0,
+              y: isMobileOpen ? 0 : 0,
+              width: isMobileOpen ? "100%" : "100%",
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          />
+          {/* Middle bar */}
+          <motion.span
+            className="block h-0.5 bg-primary rounded-full"
+            animate={{
+              opacity: isMobileOpen ? 0 : 1,
+              x: isMobileOpen ? -20 : 0,
+              width: "75%",
+            }}
+            transition={{ duration: 0.2 }}
+          />
+          {/* Bottom bar */}
+          <motion.span
+            className="block h-0.5 w-full bg-primary rounded-full origin-left"
+            animate={{
+              rotate: isMobileOpen ? -45 : 0,
+              y: isMobileOpen ? 0 : 0,
+              width: isMobileOpen ? "100%" : "50%",
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          />
+        </div>
+        {/* Pulse ring animation */}
+        <motion.div
+          className="absolute inset-0 rounded-xl border-2 border-primary/50"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.5, 0, 0.5],
+          }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+        />
       </motion.button>
 
       {/* Mobile overlay */}
