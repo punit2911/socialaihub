@@ -14,10 +14,12 @@ import {
   X,
   Zap,
   Settings,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { WorkspaceSwitcher } from "@/components/workspace/WorkspaceSwitcher";
 
 interface NavItem {
   icon: React.ElementType;
@@ -34,6 +36,7 @@ const navItems: NavItem[] = [
   { icon: BarChart3, label: "Sentiment Analysis", path: "/sentiment", badge: "AI" },
   { icon: Calendar, label: "Content Calendar", path: "/calendar", badge: "AI" },
   { icon: Target, label: "Competitor Analysis", path: "/competitors", badge: "AI" },
+  { icon: Users, label: "Team Settings", path: "/team" },
 ];
 
 export function Sidebar() {
@@ -80,6 +83,11 @@ export function Sidebar() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Workspace Switcher */}
+      <div className="px-3 mb-4">
+        <WorkspaceSwitcher collapsed={isCollapsed} />
       </div>
 
       {/* Navigation with stagger animation */}
