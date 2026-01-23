@@ -15,7 +15,6 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { FeatureCard } from "@/components/dashboard/FeatureCard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { GlassCard } from "@/components/common/GlassCard";
-import { useUserStats } from "@/hooks/useUserStats";
 
 const features = [
   {
@@ -62,6 +61,13 @@ const features = [
   },
 ];
 
+const statsData = [
+  { icon: TrendingUp, label: "Posts Generated", value: "1,247", change: "+12%", trend: "up" as const },
+  { icon: Users, label: "Reach Increase", value: "34%", change: "+8%", trend: "up" as const },
+  { icon: MessageSquare, label: "Engagement Rate", value: "5.2%", change: "+2.1%", trend: "up" as const },
+  { icon: Zap, label: "Time Saved", value: "48h", change: "this month", trend: "neutral" as const },
+];
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -83,39 +89,6 @@ const itemVariants = {
 };
 
 export default function Dashboard() {
-  const { stats, isLoading } = useUserStats();
-
-  const statsData = [
-    { 
-      icon: TrendingUp, 
-      label: "Posts Generated", 
-      value: stats.posts_generated.toLocaleString(), 
-      change: "+12%", 
-      trend: "up" as const 
-    },
-    { 
-      icon: Users, 
-      label: "Reach Increase", 
-      value: `${stats.reach_increase}%`, 
-      change: "+8%", 
-      trend: stats.reach_increase > 0 ? "up" as const : "neutral" as const 
-    },
-    { 
-      icon: MessageSquare, 
-      label: "Engagement Rate", 
-      value: `${stats.engagement_rate}%`, 
-      change: "+2.1%", 
-      trend: stats.engagement_rate > 0 ? "up" as const : "neutral" as const 
-    },
-    { 
-      icon: Zap, 
-      label: "Time Saved", 
-      value: `${stats.time_saved_hours}h`, 
-      change: "this month", 
-      trend: "neutral" as const 
-    },
-  ];
-
   return (
     <DashboardLayout>
       {/* Animated background elements */}
@@ -168,7 +141,7 @@ export default function Dashboard() {
       >
         {statsData.map((stat) => (
           <motion.div key={stat.label} variants={itemVariants}>
-            <StatCard {...stat} delay={0} isLoading={isLoading} />
+            <StatCard {...stat} delay={0} />
           </motion.div>
         ))}
       </motion.div>
