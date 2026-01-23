@@ -1,14 +1,16 @@
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface StatCardProps {
+export interface StatCardProps {
   icon: LucideIcon;
   label: string;
   value: string | number;
   change?: string;
   trend?: "up" | "down" | "neutral";
   delay?: number;
+  isLoading?: boolean;
 }
 
 export function StatCard({
@@ -18,6 +20,7 @@ export function StatCard({
   change,
   trend = "neutral",
   delay = 0,
+  isLoading = false,
 }: StatCardProps) {
   const trendColors = {
     up: "text-success",
@@ -65,14 +68,18 @@ export function StatCard({
         )}
       </div>
       <div className="relative">
-        <motion.p 
-          className="text-2xl font-display font-bold"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          {value}
-        </motion.p>
+        {isLoading ? (
+          <Skeleton className="h-8 w-20 mb-1" />
+        ) : (
+          <motion.p 
+            className="text-2xl font-display font-bold"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {value}
+          </motion.p>
+        )}
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
     </motion.div>
