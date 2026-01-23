@@ -187,7 +187,7 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile edge pull tab - appears on left edge when sidebar is closed */}
+      {/* Mobile edge pull tab - only visible on mobile (hidden on lg and above) */}
       <AnimatePresence>
         {!isMobileOpen && (
           <motion.button
@@ -195,7 +195,7 @@ export function Sidebar() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -20, opacity: 0 }}
             onClick={() => setIsMobileOpen(true)}
-            className="lg:hidden fixed left-0 top-1/2 -translate-y-1/2 z-50 py-8 px-1.5 rounded-r-xl bg-primary/20 backdrop-blur-md border border-l-0 border-primary/30"
+            className="fixed left-0 top-1/2 -translate-y-1/2 z-50 py-8 px-1.5 rounded-r-xl bg-primary/20 backdrop-blur-md border border-l-0 border-primary/30 block lg:hidden"
             whileHover={{ x: 4 }}
             whileTap={{ scale: 0.95 }}
             aria-label="Open menu"
