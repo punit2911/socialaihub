@@ -225,7 +225,7 @@ export function StatCard({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <AnimatedCounter value={value} duration={1.5} onComplete={handleCountComplete} />
+            <AnimatedCounter value={value} duration={2.5} onComplete={handleCountComplete} />
           </motion.p>
         )}
         <p className="text-xs text-muted-foreground">{label}</p>
