@@ -152,10 +152,10 @@ export function StatCard({
   // Calculate dynamic duration based on number size
   const calculateDuration = () => {
     const { num } = parseNumericValue(value);
-    if (num >= 1000) return 3.5;      // Large numbers (1,247) - slowest
-    if (num >= 100) return 3.0;       // Medium-large (like percentages over 100)
-    if (num >= 10) return 2.5;        // Medium numbers (34%, 48h)
-    return 2.0;                        // Small numbers (5.2%)
+    if (num >= 1000) return 5.0;      // Large numbers (1,247) - slowest
+    if (num >= 100) return 4.5;       // Medium-large (like percentages over 100)
+    if (num >= 10) return 4.0;        // Medium numbers (34%, 48h)
+    return 3.5;                        // Small numbers (5.2%)
   };
 
   const countDuration = calculateDuration();
