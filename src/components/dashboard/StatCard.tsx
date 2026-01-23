@@ -149,6 +149,17 @@ export function StatCard({
 }: StatCardProps) {
   const [showSparkles, setShowSparkles] = useState(false);
 
+  // Calculate dynamic duration based on number size
+  const calculateDuration = () => {
+    const { num } = parseNumericValue(value);
+    if (num >= 1000) return 3.5;      // Large numbers (1,247) - slowest
+    if (num >= 100) return 3.0;       // Medium-large (like percentages over 100)
+    if (num >= 10) return 2.5;        // Medium numbers (34%, 48h)
+    return 2.0;                        // Small numbers (5.2%)
+  };
+
+  const countDuration = calculateDuration();
+
   const trendColors = {
     up: "text-success",
     down: "text-destructive",
@@ -225,7 +236,7 @@ export function StatCard({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <AnimatedCounter value={value} duration={2.5} onComplete={handleCountComplete} />
+            <AnimatedCounter value={value} duration={countDuration} onComplete={handleCountComplete} />
           </motion.p>
         )}
         <p className="text-xs text-muted-foreground">{label}</p>
